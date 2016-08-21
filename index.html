@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<div class="chessman">
+    <i id="current" class="current" style="top: 0px;">=》</i>
+    <i class="black" style="left:50px;"></i>
+    <i class="white" style="top:80px;left:50px;"></i>
+    <i class="start" onclick="window.location.reload();">重新开始</i>
+</div>
+<div id="chessBox">
+    <ul></ul>
+</div>
+<script>
+    var chessBox=document.getElementById('chessBox');
+    var chessBoxUl=chessBox.getElementsByTagName('ul')[0];
+    var cur=document.getElementById('current');
+    var isWell=false;//设置该局棋盘是否赢了，赢了就不能再走了
+    var arr=[];
+    function chessBoxFun(rows){//画棋盘函数，rows为棋盘的行数
+        var col=chessBox.clientWidth/40;
+        var frag=document.createDocumentFragment();//建立文档碎片
+        for(var i=0;i<col;i++){
+            arr[i]=[];
+            for(var j=0;j<rows;j++)
+            {
+                arr[i][j]=false;//先将棋盘的位子内容设为false
+                var li=document.createElement('li');
+                frag.appendChild(li);
+            }
+        }
+        chessBoxUl.appendChild(frag);
+    }
+    chessBoxFun(10);//画出棋盘
+    var clickNum=0;//定义点击的次数，用奇偶判断下黑子或白子
+    chessBox.onclick=function(e){//鼠标点击棋盘，进行落子
+        var event=window.event || e;
+        var bodyChessBoxPosX=chessBox.offsetLeft;//得到节点于父级的距离（position有关）
+        var bodyChessBoxPosY=chessBox.offsetTop;
+        var pageX=event.pageX;
+        var pageY=event.pageY;
+        var I=Math.round((pageX-bodyChessBoxPosX)/40);//获取棋子下落的横坐标；
+        var J=Math.round((pageY-bodyChessBoxPosY)/40);//获取棋子下落的纵坐标；
+        var lisNode=document.getElementsByTagName('li');
+        if(arr[I][J]){//判断该位子是否已落过棋子
+            function blank(){
+                return;
+            }
+        }
+        else{
+            if(clickNum%2==0){
+                var white=document.createElement('i');
+                white.className='white';
+                white.style.top=(J*40-15)+'px';
+                white.style.left=(I*40-15)+'px';
+                lisNode[I*J].appendChild(white);
+                arr[I][J]='white';
+                cur.style.top=80+'px';
+                clickNum++;
+                judge(I,J,'white');
+            }
+            else{
+                var black=document.createElement('i');
+                black.className='black';
+                black.style.top=(J*40-15)+'px';
+                black.style.left=(I*40-15)+'px';
+                lisNode[I*J].appendChild(black);
+                arr[I][J]='black';
+                cur.style.top=0;
+                clickNum++;
+                judge(I,J,'black');
+            }
+        }
+        function judge(x, y, chess) {//判断该局棋盘是否赢了,参数分别为数组位置（I,J)，棋子的颜色(黑或白）；
+            var count1 = 0;//分四种情况讨论输赢情况
+            var count2 = 0;
+            var count3 = 0;
+            var count4 = 0;
+            //同行进行左右判断
+            for (var i = x; i >= 0; i--) {
+                if (arr[i][y] != chess) {
+                    break;
+                }
+                count1++;
+            }
+            for (var i = x + 1; i < 26; i++) {
+                if (arr[i][y] != chess) {
+                    break;
+                }
+                count1++;
+            }
+            //同列进行上下判断
+            for (var i = y; i >= 0; i--) {
+                if (arr[x][i] != chess) {
+                    break;
+                }
+                count2++;
+            }
+            for (var i = y + 1; i < 11; i++) {
+                if (arr[x][i] != chess) {
+                    break;
+                }
+                count2++;
+            }
+            //左上右下判断
+            for (var i = x, j = y; i >= 0, j >= 0; i--, j--) {
+                if (arr[i][j] != chess) {
+                    break;
+                }
+                count3++;
+            }
+            for (var i = x + 1, j = y + 1; i < 26, j < 11; i++, j++) {
+                if (arr[i][j] != chess) {
+                    break;
+                }
+                count3++;
+            }
+            //右上左下判断
+            for (var i = x, j = y; i >= 0, j < 11; i--, j++) {
+                if (arr[i][j] != chess) {
+                    break;
+                }
+                count4++;
+            }
+            for (var i = x + 1, j = y - 1; i < 26, j >= 0; i++, j--) {
+                if (arr[i][j] != chess) {
+                    break;
+                }
+                count4++;
+            }
+
+            if (count1 >= 5 || count2 >= 5 || count3 >= 5 || count4 >= 5) {//满足以上任意一种情况为获胜；
+                if (chess == 'white') {
+                    alert("白棋赢了");
+                }
+                else {
+                    alert("黑棋赢了");
+                }
+                isWell = true;//设置该局棋盘已经赢了，不可以再走了
+            }
+        }
+    }
+</script>
+</body>
+</html>
